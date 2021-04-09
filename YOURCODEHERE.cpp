@@ -33,7 +33,7 @@ using namespace std;
  * Feel free to create more global variables to track progress of your
  * heuristic.
  */
-unsigned int currentlyExploringDim = 0;
+unsigned int currentlyExploringDim = 12;
 bool currentDimDone = false;
 bool isDSEComplete = false;
 
@@ -71,7 +71,9 @@ std::string generateCacheLatencyParams(string halfBackedConfig) {
  */
 int validateConfiguration(std::string configuration) {
 
-	// FIXME - YOUR CODE HERE
+	int il1 = extractConfigPararm(configuration, 2);
+	int ifq = extractConfigPararm(configuration, 0);
+	int dl1 = extractConfigPararm(configuration, 3);
 
 	// The below is a necessary, but insufficient condition for validating a
 	// configuration.
@@ -165,7 +167,7 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 				//ss << restOfBaseline;
 
 				std::string baseLineParam;
-				baseLineParam.append(GLOB_baseline, dim*2 + 2, 2);
+				baseLineParam.append(GLOB_baseline, dim*2, 2);
 				ss << baseLineParam;
 			}
 			
@@ -188,20 +190,26 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		// Mod 1: BP -> Cache -> FPU -> Core
 		// 12->13->14->2->3->4->5->6->7->8->9->10->11->0->1
 
-
-
 		if (currentDimDone) {
-			currentlyExploringDim++;
+			
+			// Signal that DSE is complete after this configuration.
+			if (currentlyExploringDim == 1){
+				isDSEComplete = true;
+			}
+			else if (currentlyExploringDim == 14) {
+				currentlyExploringDim = 2;
+			}
+			else if (currentlyExploringDim == 11) {
+				currentlyExploringDim = 0;
+			}
+			else {
+				currentlyExploringDim++;
+			}
 			currentDimDone = false;
-			
-			//Resets bool to store the inital parameter of the next dimension
-			firstConfig = true;
-			
-		}
 
-		// Signal that DSE is complete after this configuration.
-		if (currentlyExploringDim == (NUM_DIMS - NUM_DIMS_DEPENDENT))
-			isDSEComplete = true;
+			//Resets bool to store the inital parameter of the next dimension
+			firstConfig = true;	
+		}
 	}
 	return nextconfiguration;
 }
