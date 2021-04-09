@@ -38,7 +38,8 @@ bool currentDimDone = false;
 bool isDSEComplete = false;
 
 bool firstConfig = true;
-
+bool dimsComplete[NUM_DIMS] = {false, false, false, false, false, false, false, false, false, 
+								false, false, false, false, false, false, false ,false, false};
 
 /*
  * Given a half-baked configuration containing cache properties, generate
@@ -124,12 +125,6 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		if (optimizeforEDP == 1)
 			bestConfig = bestEDPconfiguration;
 
-		
-		// Fill in the dimensions already-scanned with the already-selected best
-		// value.
-		for (int dim = 0; dim < currentlyExploringDim; ++dim) {
-			ss << extractConfigPararm(bestConfig, dim) << " ";
-		}
 
 		// Handling for currently exploring dimension. This is a very dumb
 		// implementation.
@@ -149,17 +144,32 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 
 			// Marks current dimension as done
 			currentDimDone = true;
+			dimsComplete[currentlyExploringDim] = true;
 		}
 
-		// Adds this value to the ss
-		ss << nextValue << " ";
+		// ---------BUILDS THE SS------------
+		
+		for (int dim = 0; dim < NUM_DIMS - NUM_DIMS_DEPENDENT; ++dim) {
+			if (dimsComplete[dim] == 1) {
+				// Fill in the dimensions already-scanned with the already-selected best value.
+				ss << extractConfigPararm(bestConfig, dim) << " ";
+			}
+			else if (dim == currentlyExploringDim) {
+				// Fill in the nextValue to be explored
+				ss << nextValue << " ";
+			}
+			else {
+				// Adds remainder of baseline to the current best searches and current value
+				//std::string restOfBaseline;
+				//restOfBaseline.append(GLOB_baseline, currentlyExploringDim*2 + 2, NUM_DIMS*2 - (currentlyExploringDim+1)*2 - NUM_DIMS_DEPENDENT*2);
+				//ss << restOfBaseline;
 
-		// Adds remainder of baseline to the current best searches and current value
-		std::string restOfBaseline;
-		restOfBaseline.append(GLOB_baseline, currentlyExploringDim*2 + 2, NUM_DIMS*2 - (currentlyExploringDim+1)*2 - NUM_DIMS_DEPENDENT*2);
-
-		ss << restOfBaseline;
-
+				std::string baseLineParam;
+				baseLineParam.append(GLOB_baseline, dim*2 + 2, 2);
+				ss << baseLineParam;
+			}
+			
+		}
 		//
 		// Last NUM_DIMS_DEPENDENT3 configuration parameters are not independent.
 		// They depend on one or more parameters already set. Determine the
@@ -173,7 +183,13 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		// Configuration is ready now.
 		nextconfiguration = ss.str();
 
-		// Make sure we start exploring next dimension in next iteration.
+
+		// Handles the order of dimensions 
+		// Mod 1: BP -> Cache -> FPU -> Core
+		// 12->13->14->2->3->4->5->6->7->8->9->10->11->0->1
+
+
+
 		if (currentDimDone) {
 			currentlyExploringDim++;
 			currentDimDone = false;
