@@ -37,6 +37,9 @@ unsigned int currentlyExploringDim = 0;
 bool currentDimDone = false;
 bool isDSEComplete = false;
 
+int startParam;
+bool firstConfig = true;
+
 /*
  * Given a half-baked configuration containing cache properties, generate
  * latency parameters in configuration string. You will need information about
@@ -99,6 +102,10 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 
 	std::string nextconfiguration = currentconfiguration;
 	// Continue if proposed configuration is invalid or has been seen/checked before.
+
+	// Variable to store paramter of dimension from baseline and if its the first time 
+	// searching through this dimension
+
 	while (!validateConfiguration(nextconfiguration) ||
 		GLOB_seen_configurations[nextconfiguration]) {
 
@@ -117,22 +124,34 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		if (optimizeforEDP == 1)
 			bestConfig = bestEDPconfiguration;
 
-		// ADD TO THIS- change according to code
+		
 		// Fill in the dimensions already-scanned with the already-selected best
 		// value.
 		for (int dim = 0; dim < currentlyExploringDim; ++dim) {
 			ss << extractConfigPararm(bestConfig, dim) << " ";
 		}
 
-		// ADD TO THIS
 		// Handling for currently exploring dimension. This is a very dumb
 		// implementation.
-		int nextValue = extractConfigPararm(nextconfiguration,
-				currentlyExploringDim) + 1;
+		int nextValue = extractConfigPararm(nextconfiguration, currentlyExploringDim) + 1;
 
+		if (firstConfig) {
+			startParam = extractConfigPararm(nextconfiguration, currentlyExploringDim);
+			nextValue = 0;
+			firstConfig = false;
+		}
+
+		if (nextValue == startParam) {
+			nextValue ++;
+		}
 		
 		if (nextValue >= GLOB_dimensioncardinality[currentlyExploringDim]) {
 			nextValue = GLOB_dimensioncardinality[currentlyExploringDim] - 1;
+
+			if (nextValue == startParam) {
+				nextValue --;
+			}
+
 			currentDimDone = true;
 		}
 
@@ -149,15 +168,15 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		}
 		*/
 
-		cout << "CURRENTLY EXPLORING DIM: " << currentlyExploringDim << "\n";
+		//cout << "CURRENTLY EXPLORING DIM: " << currentlyExploringDim << "\n";
 		std::string restOfBaseline;
 		restOfBaseline.append(GLOB_baseline, currentlyExploringDim*2 + 2, NUM_DIMS*2 - (currentlyExploringDim+1)*2 - NUM_DIMS_DEPENDENT*2);
-		cout << "REST OF BASELINE: " << restOfBaseline << "\n";
+		//cout << "REST OF BASELINE: " << restOfBaseline << "\n";
 
 		ss << restOfBaseline;
 
-		cout << "CURRENT SS AFTER BASELINE ADDED: " << ss.str() << "\n";
-		cout << "LENGTH OF SS: " << ss.str().length() << "\n";
+		//cout << "CURRENT SS AFTER BASELINE ADDED: " << ss.str() << "\n";
+		//cout << "LENGTH OF SS: " << ss.str().length() << "\n";
 
 		//
 		// Last NUM_DIMS_DEPENDENT3 configuration parameters are not independent.
@@ -168,8 +187,8 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 
 		// Populate this object using corresponding parameters from config.
 		ss << generateCacheLatencyParams(configSoFar);
-		cout << "CURRENT SS AFTER LATENCY: " << ss.str() << "\n";
-		cout << "LENGTH OF SS AFTER LATENCY: " << ss.str().length() << "\n\n";
+		//cout << "CURRENT SS AFTER LATENCY: " << ss.str() << "\n";
+		//cout << "LENGTH OF SS AFTER LATENCY: " << ss.str().length() << "\n\n";
 
 		// Configuration is ready now.
 		nextconfiguration = ss.str();
@@ -178,6 +197,8 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		if (currentDimDone) {
 			currentlyExploringDim++;
 			currentDimDone = false;
+			// Resets bool to store the inital parameter of the next dimension
+			firstConfig = true;
 		}
 
 		// Signal that DSE is complete after this configuration.
