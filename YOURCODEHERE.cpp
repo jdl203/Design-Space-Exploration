@@ -40,8 +40,11 @@ bool isDSEComplete = false;
 int startParam;
 bool firstConfig = true;
 <<<<<<< HEAD
+<<<<<<< HEAD
 bool dimsComplete[NUM_DIMS] = {false, false, false, false, false, false, false, false, false, 
 								false, false, false, false, false, false, false ,false, false};
+=======
+>>>>>>> parent of 73def84 (Undid the exclusion of the baselines, should include them)
 =======
 >>>>>>> parent of 73def84 (Undid the exclusion of the baselines, should include them)
 
@@ -156,6 +159,7 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 		// ---------BUILDS THE SS------------
 		
 		for (int dim = 0; dim < NUM_DIMS - NUM_DIMS_DEPENDENT; ++dim) {
@@ -180,6 +184,8 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 			
 		}
 =======
+=======
+>>>>>>> parent of 73def84 (Undid the exclusion of the baselines, should include them)
 		ss << nextValue << " ";
 
 		// ADD TO THIS
@@ -203,6 +209,9 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 		//cout << "CURRENT SS AFTER BASELINE ADDED: " << ss.str() << "\n";
 		//cout << "LENGTH OF SS: " << ss.str().length() << "\n";
 
+<<<<<<< HEAD
+>>>>>>> parent of 73def84 (Undid the exclusion of the baselines, should include them)
+=======
 >>>>>>> parent of 73def84 (Undid the exclusion of the baselines, should include them)
 		//
 		// Last NUM_DIMS_DEPENDENT3 configuration parameters are not independent.
