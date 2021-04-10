@@ -73,7 +73,36 @@ int validateConfiguration(std::string configuration) {
 
 	int il1 = extractConfigPararm(configuration, 2);
 	int ifq = extractConfigPararm(configuration, 0);
-	int dl1 = extractConfigPararm(configuration, 3);
+	int ul2 = extractConfigPararm(configuration, 8);
+
+	// Checks if il1 less than ifq (il1 in B, ifq * 8 = B)
+	if (il1 < ifq) {
+		cout << "NOT VALID\n";
+		return 0;
+	}
+
+	// Checks if ul2 less than twice il1
+	if (ul2 < il1) {
+		cout << "NOT VALID ul2\n";
+		return 0;
+	}
+	
+	// Checks il1 and dl1 size Min: 2 KB, Max: 64 KB
+	if (getil1size(configuration) < 2000 || getil1size(configuration) > 64000) {
+		cout << "NOT VALID IL1 SIZE\n";
+		return 0;
+	}
+	if (getdl1size(configuration) < 2000 || getdl1size(configuration) > 64000) {
+		cout << "NOT VALID DL1 SIZE\n";
+		return 0;
+	}
+
+	// Checks ul2 size Min: 32 KB, Max: 1 MB
+	if (getl2size(configuration) < 32000 || getl2size(configuration) > 1000000) {
+		cout << "NOT VALID L2 SIZE\n";
+		return 0;
+	}
+
 
 	// The below is a necessary, but insufficient condition for validating a
 	// configuration.
