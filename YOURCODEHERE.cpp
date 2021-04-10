@@ -14,6 +14,7 @@
 #include <iterator>
 
 #include "431project.h"
+#include "math.h"
 
 #include <iostream>
 
@@ -50,20 +51,29 @@ bool dimsComplete[NUM_DIMS] = {false, false, false, false, false, false, false, 
  */
 std::string generateCacheLatencyParams(string halfBackedConfig) {
 
-	string latencySettings;
+	std::stringstream ssLatency;
+	string defaultLatency = "1 1 1";
+	int dl1lat, il1lat, ul2lat = 0;
+	
+	int il1Size = getil1size(halfBackedConfig + defaultLatency);
+	int dl1Size = getdl1size(halfBackedConfig + defaultLatency);
+	int l2Size = getl2size(halfBackedConfig + defaultLatency);
 
-	//
-	//YOUR CODE BEGINS HERE
-	//
+	for (int x = 1; x < 11; x++) {
+		if ((1024 * pow(2.0, (double)x)) == il1Size) {
+			il1lat = x;
+		}
+		if ((1024 * pow(2.0, (double)x)) == dl1Size) {
+			dl1lat = x;
+		}
+		if ((1024 * pow(2.0, (double)x)) == l2Size) {
+			ul2lat = x;
+		}
+	}
 
-	// This is a dumb implementation.
-	latencySettings = "1 1 1";
+	ssLatency << dl1lat << " " << il1lat << " " << ul2lat;
 
-	//
-	//YOUR CODE ENDS HERE
-	//
-
-	return latencySettings;
+	return ssLatency.str();
 }
 
 /*
@@ -77,29 +87,24 @@ int validateConfiguration(std::string configuration) {
 
 	// Checks if il1 less than ifq (il1 in B, ifq * 8 = B)
 	if (il1 < ifq) {
-		cout << "NOT VALID\n";
 		return 0;
 	}
 
 	// Checks if ul2 less than twice il1
 	if (ul2 < il1) {
-		cout << "NOT VALID ul2\n";
 		return 0;
 	}
 	
 	// Checks il1 and dl1 size Min: 2 KB, Max: 64 KB
-	if (getil1size(configuration) < 2000 || getil1size(configuration) > 64000) {
-		cout << "NOT VALID IL1 SIZE\n";
+	if (getil1size(configuration) < 2048 || getil1size(configuration) > 65536) {
 		return 0;
 	}
-	if (getdl1size(configuration) < 2000 || getdl1size(configuration) > 64000) {
-		cout << "NOT VALID DL1 SIZE\n";
+	if (getdl1size(configuration) < 2048 || getdl1size(configuration) > 65536) {
 		return 0;
 	}
 
 	// Checks ul2 size Min: 32 KB, Max: 1 MB
-	if (getl2size(configuration) < 32000 || getl2size(configuration) > 1000000) {
-		cout << "NOT VALID L2 SIZE\n";
+	if (getl2size(configuration) < 32768 || getl2size(configuration) > 1048576) {
 		return 0;
 	}
 
