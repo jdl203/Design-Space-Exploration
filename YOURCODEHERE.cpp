@@ -55,22 +55,37 @@ std::string generateCacheLatencyParams(string halfBackedConfig) {
 	string defaultLatency = "1 1 1";
 	int dl1lat, il1lat, ul2lat = 0;
 	
+	// Gets the sizes of cache values
 	int il1Size = getil1size(halfBackedConfig + defaultLatency);
 	int dl1Size = getdl1size(halfBackedConfig + defaultLatency);
 	int l2Size = getl2size(halfBackedConfig + defaultLatency);
 
+	// Assignes cordinated values for sizes to latency settins
+	// ** THIS IS FOR DIRECTED MAPPED CACHES
 	for (int x = 1; x < 11; x++) {
 		if ((1024 * pow(2.0, (double)x)) == il1Size) {
-			il1lat = x;
+			il1lat = x-1;
 		}
 		if ((1024 * pow(2.0, (double)x)) == dl1Size) {
-			dl1lat = x;
+			dl1lat = x-1;
 		}
 		if ((1024 * pow(2.0, (double)x)) == l2Size) {
-			ul2lat = x;
+			ul2lat = x-5;
 		}
 	}
 
+	// Adjusts latencies for multiple-way associative
+	int il1Assoc = extractConfigPararm(halfBackedConfig + defaultLatency, 6);
+	int dl1Assoc = extractConfigPararm(halfBackedConfig + defaultLatency, 4);
+	int ul2Assoc = extractConfigPararm(halfBackedConfig + defaultLatency, 9);
+
+	// Adds the additional cycles to the latencies
+	// Values match up with index value parameters, no need to calculate
+	il1lat += il1Assoc;
+	dl1lat += dl1Assoc;
+	ul2lat += ul2Assoc;
+
+	// Adds the latency to the ss
 	ssLatency << dl1lat << " " << il1lat << " " << ul2lat;
 
 	return ssLatency.str();
