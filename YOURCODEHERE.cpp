@@ -22,11 +22,10 @@ using namespace std;
 
 /*
  * Enter your PSU IDs here to select the appropriate scanning order.
- * Tamara's ID: 954153742
- * James's ID: 941006691
+ * Tamara's ID: 954153742 PSU E-mail: TFQ5018
+ * James's ID: 941006691 PSU E-mail: JFL5677
  */
 #define PSU_ID_SUM (954153742+941006691)
-// LETS GOOOOOOOO :)
 
 /*
  * Some global variables to track heuristic progress.
