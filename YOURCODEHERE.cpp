@@ -209,11 +209,7 @@ std::string generateNextConfigurationProposal(std::string currentconfiguration,
 				ss << nextValue << " ";
 			}
 			else {
-				// Adds remainder of baseline to the current best searches and current value
-				//std::string restOfBaseline;
-				//restOfBaseline.append(GLOB_baseline, currentlyExploringDim*2 + 2, NUM_DIMS*2 - (currentlyExploringDim+1)*2 - NUM_DIMS_DEPENDENT*2);
-				//ss << restOfBaseline;
-
+				// Fill in the value for baseline
 				std::string baseLineParam;
 				baseLineParam.append(GLOB_baseline, dim*2, 2);
 				ss << baseLineParam;
